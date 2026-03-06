@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="description" content="Jeu d'enquête et de déduction — Résolvez 4 affaires criminelles mystérieuses">
+    <title>Ombres & Vérités — Jeu d'Enquête</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-96.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+
+        <!-- ===== MAIN MENU ===== -->
+        <div id="main-menu" class="screen active">
+            <div class="rain-overlay"></div>
+            <div class="menu-content">
+                <h1 class="game-title">Ombres &amp; Vérités</h1>
+                <p class="game-subtitle">— Jeu d'Enquête —</p>
+                <div class="menu-buttons">
+                    <button class="btn btn-primary" id="btn-new-game">Nouvelle Enquête</button>
+                    <button class="btn btn-primary" id="btn-continue" style="display:none">Continuer</button>
+                    <button class="btn btn-secondary" id="btn-how-to">Comment Jouer</button>
+                    <button class="btn btn-secondary" id="btn-settings">Options</button>
+                    <button class="btn btn-install" id="btn-install-pwa" style="display:none">📲 Installer l'App</button>
+                </div>
+                <p class="version-info">v2.0 — 4 Enquêtes</p>
+            </div>
+        </div>
+
+        <!-- ===== CASE SELECTION ===== -->
+        <div id="case-select-screen" class="screen">
+            <div class="rain-overlay"></div>
+            <div class="case-select-content">
+                <h2 class="case-select-title">Choisissez votre Enquête</h2>
+                <p class="case-select-subtitle">Sélectionnez une affaire à résoudre</p>
+                <div id="cases-grid" class="cases-grid"></div>
+                <button class="btn btn-secondary" id="btn-back-cases">Retour</button>
+            </div>
+        </div>
+
+        <!-- ===== HOW TO PLAY ===== -->
+        <div id="howto-screen" class="screen">
+            <div class="screen-content">
+                <h2>Comment Jouer</h2>
+                <div class="howto-list">
+                    <div class="howto-item">
+                        <span class="howto-icon">🔍</span>
+                        <div>
+                            <h3>Explorez les Scènes</h3>
+                            <p>Touchez les zones interactives pour examiner les objets et découvrir des indices.</p>
+                        </div>
+                    </div>
+                    <div class="howto-item">
+                        <span class="howto-icon">🗣️</span>
+                        <div>
+                            <h3>Interrogez les Suspects</h3>
+                            <p>Parlez aux personnages et choisissez vos questions avec soin.</p>
+                        </div>
+                    </div>
+                    <div class="howto-item">
+                        <span class="howto-icon">📋</span>
+                        <div>
+                            <h3>Collectez les Preuves</h3>
+                            <p>Tous les indices sont stockés dans votre carnet. Consultez-le à tout moment.</p>
+                        </div>
+                    </div>
+                    <div class="howto-item">
+                        <span class="howto-icon">🧩</span>
+                        <div>
+                            <h3>Tableau de Déduction</h3>
+                            <p>Reliez les preuves entre elles pour formuler des hypothèses et résoudre l'affaire.</p>
+                        </div>
+                    </div>
+                    <div class="howto-item">
+                        <span class="howto-icon">⚖️</span>
+                        <div>
+                            <h3>Accusez le Coupable</h3>
+                            <p>Quand vous êtes prêt, présentez votre accusation. Attention, une erreur peut changer la fin !</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" id="btn-back-howto">Retour</button>
+            </div>
+        </div>
+
+        <!-- ===== SETTINGS ===== -->
+        <div id="settings-screen" class="screen">
+            <div class="screen-content">
+                <h2>Options</h2>
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <label>Musique d'ambiance</label>
+                        <input type="range" id="music-vol" min="0" max="100" value="60">
+                    </div>
+                    <div class="setting-item">
+                        <label>Effets Sonores</label>
+                        <input type="range" id="sfx-vol" min="0" max="100" value="80">
+                    </div>
+                    <div class="setting-item">
+                        <label>Vitesse du texte</label>
+                        <select id="text-speed">
+                            <option value="fast">Rapide</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="slow">Lent</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" id="btn-back-settings">Retour</button>
+            </div>
+        </div>
+
+        <!-- ===== GAME SCREEN ===== -->
+        <div id="game-screen" class="screen">
+            
+            <!-- Top Bar -->
+            <div id="top-bar">
+                <div class="top-left">
+                    <span id="case-title" class="case-title">Affaire #1</span>
+                    <span id="location-name" class="location-name">Bureau du Commissaire</span>
+                </div>
+                <div class="top-right">
+                    <button class="icon-btn" id="btn-notebook" title="Carnet">📋</button>
+                    <button class="icon-btn" id="btn-board" title="Tableau de preuves">🧩</button>
+                    <button class="icon-btn" id="btn-map" title="Carte / Lieux">🗺️</button>
+                    <button class="icon-btn" id="btn-pause" title="Pause">⏸️</button>
+                </div>
+            </div>
+
+            <!-- Scene Area -->
+            <div id="scene-area">
+                <div id="scene-image-container">
+                    <canvas id="scene-canvas"></canvas>
+                    <div id="hotspots-layer"></div>
+                    <div id="scene-overlay" class="scene-overlay"></div>
+                </div>
+            </div>
+
+            <!-- Dialogue Box -->
+            <div id="dialogue-box" style="display:none">
+                <div class="dialogue-portrait" id="dialogue-portrait"></div>
+                <div class="dialogue-content">
+                    <div class="dialogue-speaker" id="dialogue-speaker">???</div>
+                    <div class="dialogue-text" id="dialogue-text"></div>
+                    <div class="dialogue-choices" id="dialogue-choices"></div>
+                    <div class="dialogue-continue" id="dialogue-continue">▼ Tapez pour continuer</div>
+                </div>
+            </div>
+
+            <!-- Notification -->
+            <div id="notification" class="notification hidden">
+                <span id="notif-icon">🔍</span>
+                <span id="notif-text">Nouvel indice découvert !</span>
+            </div>
+        </div>
+
+        <!-- ===== NOTEBOOK ===== -->
+        <div id="notebook-screen" class="screen overlay-screen">
+            <div class="notebook">
+                <div class="notebook-tabs">
+                    <button class="nb-tab active" data-tab="clues">Indices</button>
+                    <button class="nb-tab" data-tab="suspects">Suspects</button>
+                    <button class="nb-tab" data-tab="journal">Journal</button>
+                </div>
+                <div class="notebook-page" id="nb-page-clues">
+                    <h3>Indices Collectés</h3>
+                    <div id="clues-list" class="clues-list"></div>
+                </div>
+                <div class="notebook-page" id="nb-page-suspects" style="display:none">
+                    <h3>Suspects</h3>
+                    <div id="suspects-list" class="suspects-list"></div>
+                </div>
+                <div class="notebook-page" id="nb-page-journal" style="display:none">
+                    <h3>Journal de l'Enquête</h3>
+                    <div id="journal-list" class="journal-list"></div>
+                </div>
+                <button class="btn btn-close" id="btn-close-notebook">✕</button>
+            </div>
+        </div>
+
+        <!-- ===== EVIDENCE BOARD ===== -->
+        <div id="board-screen" class="screen overlay-screen">
+            <div class="evidence-board">
+                <h2>Tableau de Déduction</h2>
+                <div class="board-area" id="board-area">
+                    <canvas id="board-canvas"></canvas>
+                    <div id="board-items"></div>
+                </div>
+                <div class="board-toolbar">
+                    <button class="btn btn-small" id="btn-connect">Relier</button>
+                    <button class="btn btn-small btn-danger" id="btn-clear-board">Effacer liens</button>
+                    <button class="btn btn-small btn-accent" id="btn-accuse">Accuser</button>
+                </div>
+                <button class="btn btn-close" id="btn-close-board">✕</button>
+            </div>
+        </div>
+
+        <!-- ===== MAP / LOCATIONS ===== -->
+        <div id="map-screen" class="screen overlay-screen">
+            <div class="map-container">
+                <h2>Lieux de l'Enquête</h2>
+                <div id="locations-grid" class="locations-grid"></div>
+                <button class="btn btn-close" id="btn-close-map">✕</button>
+            </div>
+        </div>
+
+        <!-- ===== ACCUSATION ===== -->
+        <div id="accusation-screen" class="screen overlay-screen">
+            <div class="accusation-panel">
+                <h2>Formuler l'Accusation</h2>
+                <p class="accuse-desc">Qui est le coupable ? Sélectionnez un suspect et présentez vos preuves.</p>
+                <div id="accuse-suspects" class="accuse-suspects"></div>
+                <div id="accuse-evidence" class="accuse-evidence">
+                    <h3>Preuves à l'appui</h3>
+                    <div id="accuse-clues-list"></div>
+                </div>
+                <div class="accuse-actions">
+                    <button class="btn btn-accent" id="btn-submit-accusation" disabled>Confirmer l'accusation</button>
+                    <button class="btn btn-secondary" id="btn-cancel-accusation">Annuler</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PAUSE MENU ===== -->
+        <div id="pause-screen" class="screen overlay-screen">
+            <div class="screen-content">
+                <h2>Pause</h2>
+                <div class="menu-buttons">
+                    <button class="btn btn-primary" id="btn-resume">Reprendre</button>
+                    <button class="btn btn-secondary" id="btn-save">Sauvegarder</button>
+                    <button class="btn btn-secondary" id="btn-quit-menu">Menu Principal</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ENDING SCREEN ===== -->
+        <div id="ending-screen" class="screen">
+            <div class="screen-content ending-content">
+                <h2 id="ending-title">Fin de l'Enquête</h2>
+                <div id="ending-text" class="ending-text"></div>
+                <div id="ending-stats" class="ending-stats"></div>
+                <div class="menu-buttons">
+                    <button class="btn btn-primary" id="btn-replay">Rejouer</button>
+                    <button class="btn btn-secondary" id="btn-ending-menu">Menu Principal</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/engine/Utils.js"></script>
+    <script src="js/engine/AudioManager.js"></script>
+    <script src="js/engine/StateManager.js"></script>
+    <script src="js/engine/SaveManager.js"></script>
+    <script src="js/engine/SceneRenderer.js"></script>
+    <script src="js/systems/DialogueSystem.js"></script>
+    <script src="js/systems/ClueSystem.js"></script>
+    <script src="js/systems/DeductionBoard.js"></script>
+    <script src="js/systems/SceneExplorer.js"></script>
+    <script src="js/data/CaseData.js"></script>
+    <script src="js/data/CaseData2.js"></script>
+    <script src="js/data/CaseData3.js"></script>
+    <script src="js/data/CaseData4.js"></script>
+    <script src="js/ui/MenuManager.js"></script>
+    <script src="js/ui/Notebook.js"></script>
+    <script src="js/ui/MapView.js"></script>
+    <script src="js/Game.js"></script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('✅ Service Worker enregistré:', reg.scope))
+                .catch(err => console.warn('⚠️ Service Worker non enregistré:', err));
+        });
+    }
+
+    // PWA Install Prompt
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        // Show install button
+        const installBtn = document.getElementById('btn-install-pwa');
+        if (installBtn) {
+            installBtn.style.display = '';
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log('Install prompt outcome:', outcome);
+                    deferredPrompt = null;
+                    installBtn.style.display = 'none';
+                }
+            });
+        }
+    });
+
+    window.addEventListener('appinstalled', () => {
+        console.log('🎉 App installée !');
+        deferredPrompt = null;
+        const installBtn = document.getElementById('btn-install-pwa');
+        if (installBtn) installBtn.style.display = 'none';
+    });
+    </script>
+</body>
+</html>

@@ -10,6 +10,7 @@ class SceneRenderer {
         this.animFrame = null;
         this.currentScene = null;
         this._imageCache = {};
+        this._retryTimer = null;
         this._preloadAll();
     }
 
@@ -21,15 +22,36 @@ class SceneRenderer {
             'island_dock','lighthouse','lighthouse_top','keeper_house','boathouse',
             'museum_entrance','museum_gallery','museum_security','museum_office','museum_workshop'
         ];
+        this._loadedCount = 0;
+        this._totalScenes = scenes.length;
         scenes.forEach(id => {
             const img = new Image();
-            img.src = `./images/scenes/${id}.jpg`;
+            img.crossOrigin = 'anonymous';
             img.onload = () => {
                 this._imageCache[id] = img;
+                this._loadedCount++;
+                console.log(`[SceneRenderer] ✅ ${id} loaded (${this._loadedCount}/${this._totalScenes})`);
                 // Redraw if this scene is currently showing
                 if (this.currentScene === id) this.renderScene(id);
             };
+            img.onerror = (e) => {
+                console.warn(`[SceneRenderer] ❌ Failed to load: ${id}`, e);
+                this._loadedCount++;
+            };
+            // Add cache-busting for fresh load
+            img.src = `./images/scenes/${id}.jpg?v=4`;
         });
+    }
+
+    /** Clear canvas and reset current scene (call before switching cases) */
+    clear() {
+        if (this._retryTimer) {
+            clearTimeout(this._retryTimer);
+            this._retryTimer = null;
+        }
+        this.currentScene = null;
+        const { ctx, canvas } = this;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
     resize() {
@@ -47,8 +69,26 @@ class SceneRenderer {
     renderScene(sceneId) {
         this.currentScene = sceneId;
         const { ctx, canvas } = this;
-        const w = canvas.width;
-        const h = canvas.height;
+        let w = canvas.width;
+        let h = canvas.height;
+
+        // If canvas has no size, force resize first
+        if (w === 0 || h === 0) {
+            this.resize();
+            w = canvas.width;
+            h = canvas.height;
+            if (w === 0 || h === 0) {
+                // Container not visible yet — retry shortly, but only if still the current scene
+                if (this._retryTimer) clearTimeout(this._retryTimer);
+                this._retryTimer = setTimeout(() => {
+                    this._retryTimer = null;
+                    if (this.currentScene === sceneId) {
+                        this.renderScene(sceneId);
+                    }
+                }, 100);
+                return;
+            }
+        }
 
         ctx.clearRect(0, 0, w, h);
 
@@ -57,6 +97,7 @@ class SceneRenderer {
         if (img && img.complete && img.naturalWidth > 0) {
             this._drawImage(img, w, h);
         } else {
+            console.log(`[SceneRenderer] Image not ready for "${sceneId}", using procedural fallback`);
             // Procedural fallback
             switch (sceneId) {
                 case 'office': this._drawOffice(w, h); break;

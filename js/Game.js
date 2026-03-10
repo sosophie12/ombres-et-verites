@@ -152,6 +152,9 @@ class Game {
         this.menuManager.showScreen('game-screen');
         Utils.$('case-title').textContent = caseData.title;
 
+        // Clear renderer state from previous case before resize
+        this.renderer.clear();
+
         // Resize canvas
         this._resizeCanvas();
 
@@ -193,6 +196,8 @@ class Game {
             this.menuManager.showScreen('game-screen');
             Utils.$('case-title').textContent = this.currentCaseData.title;
 
+            // Clear renderer state before resize
+            this.renderer.clear();
             this._resizeCanvas();
 
             // Resume timer

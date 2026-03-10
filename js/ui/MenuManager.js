@@ -47,11 +47,10 @@ class MenuManager {
     }
 
     showScreen(screenId) {
-        // Hide all non-overlay screens
+        // Hide ALL screens (including overlays)
         Object.values(this.screens).forEach(el => {
-            if (!el.classList.contains('overlay-screen')) {
-                el.classList.remove('active');
-            }
+            el.classList.remove('active');
+            el.classList.remove('fade-in');
         });
 
         // Show target
@@ -75,6 +74,7 @@ class MenuManager {
         const target = this.screens[screenId];
         if (target) {
             target.classList.remove('active');
+            target.classList.remove('fade-in');
         }
     }
 

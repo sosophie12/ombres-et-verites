@@ -1,6 +1,6 @@
 /**
- * SceneRenderer.js — Renders scene backgrounds procedurally on canvas
- * Draws room environments with furniture and atmospheric effects
+ * SceneRenderer.js — Renders scene backgrounds on canvas
+ * Loads pre-generated images with procedural fallback
  */
 class SceneRenderer {
     constructor(canvas) {
@@ -9,6 +9,27 @@ class SceneRenderer {
         this.particles = [];
         this.animFrame = null;
         this.currentScene = null;
+        this._imageCache = {};
+        this._preloadAll();
+    }
+
+    /** Pre-load all scene images into cache */
+    _preloadAll() {
+        const scenes = [
+            'mansion_entrance','living_room','study','kitchen','garden','bedroom','office',
+            'theatre_entrance','theatre_stage','backstage',
+            'island_dock','lighthouse','lighthouse_top','keeper_house','boathouse',
+            'museum_entrance','museum_gallery','museum_security','museum_office','museum_workshop'
+        ];
+        scenes.forEach(id => {
+            const img = new Image();
+            img.src = `./images/scenes/${id}.jpg`;
+            img.onload = () => {
+                this._imageCache[id] = img;
+                // Redraw if this scene is currently showing
+                if (this.currentScene === id) this.renderScene(id);
+            };
+        });
     }
 
     resize() {
@@ -21,7 +42,7 @@ class SceneRenderer {
     }
 
     /**
-     * Render a procedural scene background
+     * Render scene — image if available, procedural fallback otherwise
      */
     renderScene(sceneId) {
         this.currentScene = sceneId;
@@ -31,19 +52,39 @@ class SceneRenderer {
 
         ctx.clearRect(0, 0, w, h);
 
-        switch (sceneId) {
-            case 'office': this._drawOffice(w, h); break;
-            case 'mansion_entrance': this._drawMansionEntrance(w, h); break;
-            case 'living_room': this._drawLivingRoom(w, h); break;
-            case 'study': this._drawStudy(w, h); break;
-            case 'garden': this._drawGarden(w, h); break;
-            case 'kitchen': this._drawKitchen(w, h); break;
-            case 'bedroom': this._drawBedroom(w, h); break;
-            default: this._drawDefaultRoom(w, h); break;
+        // Try image first
+        const img = this._imageCache[sceneId];
+        if (img && img.complete && img.naturalWidth > 0) {
+            this._drawImage(img, w, h);
+        } else {
+            // Procedural fallback
+            switch (sceneId) {
+                case 'office': this._drawOffice(w, h); break;
+                case 'mansion_entrance': this._drawMansionEntrance(w, h); break;
+                case 'living_room': this._drawLivingRoom(w, h); break;
+                case 'study': this._drawStudy(w, h); break;
+                case 'garden': this._drawGarden(w, h); break;
+                case 'kitchen': this._drawKitchen(w, h); break;
+                case 'bedroom': this._drawBedroom(w, h); break;
+                default: this._drawDefaultRoom(w, h); break;
+            }
         }
 
         // Vignette overlay
         this._drawVignette(w, h);
+    }
+
+    /** Draw image covering the canvas (cover fit) */
+    _drawImage(img, w, h) {
+        const ctx = this.ctx;
+        const iw = img.naturalWidth;
+        const ih = img.naturalHeight;
+        const scale = Math.max(w / iw, h / ih);
+        const sw = iw * scale;
+        const sh = ih * scale;
+        const sx = (w - sw) / 2;
+        const sy = (h - sh) / 2;
+        ctx.drawImage(img, sx, sy, sw, sh);
     }
 
     // ===== SCENE DRAWING METHODS =====

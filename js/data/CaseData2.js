@@ -420,7 +420,7 @@ Vous êtes chargé d'enquêter parmi les membres de l'orchestre et son entourage
             id: 'theatre_office',
             name: 'Bureau du Théâtre',
             icon: '🏢',
-            scene: 'office',
+            scene: 'theatre_office',
             description: 'Le bureau administratif du directeur du théâtre.',
             unlocked: false,
             hotspots: [

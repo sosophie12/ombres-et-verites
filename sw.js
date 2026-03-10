@@ -3,7 +3,7 @@
  * Enables offline play and app-like experience
  */
 
-const CACHE_NAME = 'ombres-verites-v2.2';
+const CACHE_NAME = 'ombres-verites-v3.0';
 
 const ASSETS_TO_CACHE = [
     './',
@@ -34,7 +34,29 @@ const ASSETS_TO_CACHE = [
     './icons/icon-152.png',
     './icons/icon-192.png',
     './icons/icon-384.png',
-    './icons/icon-512.png'
+    './icons/icon-512.png',
+    // Scene images
+    './images/scenes/mansion_entrance.jpg',
+    './images/scenes/living_room.jpg',
+    './images/scenes/study.jpg',
+    './images/scenes/kitchen.jpg',
+    './images/scenes/garden.jpg',
+    './images/scenes/bedroom.jpg',
+    './images/scenes/office.jpg',
+    './images/scenes/theatre_entrance.jpg',
+    './images/scenes/theatre_stage.jpg',
+    './images/scenes/backstage.jpg',
+    './images/scenes/theatre_office.jpg',
+    './images/scenes/island_dock.jpg',
+    './images/scenes/lighthouse.jpg',
+    './images/scenes/lighthouse_top.jpg',
+    './images/scenes/keeper_house.jpg',
+    './images/scenes/boathouse.jpg',
+    './images/scenes/museum_entrance.jpg',
+    './images/scenes/museum_gallery.jpg',
+    './images/scenes/museum_security.jpg',
+    './images/scenes/museum_office.jpg',
+    './images/scenes/museum_workshop.jpg'
 ];
 
 // Install — cache all game assets

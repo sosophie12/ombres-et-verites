@@ -25,8 +25,9 @@ class MenuManager {
         Utils.$('btn-back-settings').addEventListener('click', () => this.showScreen('main-menu'));
 
         // Pause
-        Utils.$('btn-resume').addEventListener('click', () => this.showScreen('game-screen'));
+        Utils.$('btn-resume').addEventListener('click', () => this.closeOverlay('pause-screen'));
         Utils.$('btn-quit-menu').addEventListener('click', () => {
+            this.closeOverlay('pause-screen');
             this.showScreen('main-menu');
             Utils.hide('hud');
         });

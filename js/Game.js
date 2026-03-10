@@ -228,6 +228,7 @@ class Game {
         // Pause buttons
         Utils.$('btn-save').addEventListener('click', () => {
             this._saveGame();
+            this.menuManager.closeOverlay('pause-screen');
         });
 
         // Ending screen

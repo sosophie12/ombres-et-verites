@@ -3,7 +3,7 @@
  * Enables offline play and app-like experience
  */
 
-const CACHE_NAME = 'ombres-verites-v3.1';
+const CACHE_NAME = 'ombres-verites-v4.0';
 
 const ASSETS_TO_CACHE = [
     './',

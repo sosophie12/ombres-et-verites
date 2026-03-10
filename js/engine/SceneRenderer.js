@@ -17,7 +17,7 @@ class SceneRenderer {
     _preloadAll() {
         const scenes = [
             'mansion_entrance','living_room','study','kitchen','garden','bedroom','office',
-            'theatre_entrance','theatre_stage','backstage',
+            'theatre_entrance','theatre_stage','backstage','theatre_office',
             'island_dock','lighthouse','lighthouse_top','keeper_house','boathouse',
             'museum_entrance','museum_gallery','museum_security','museum_office','museum_workshop'
         ];

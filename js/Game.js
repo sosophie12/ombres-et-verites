@@ -589,8 +589,8 @@ class Game {
         // Prevent pull-to-refresh and bounce scrolling on game container
         const container = Utils.$('game-container');
         container.addEventListener('touchmove', (e) => {
-            // Allow scrolling in scrollable panels (notebook, accusation, etc.)
-            const isScrollable = e.target.closest('.notebook-page, .ending-text, .accusation-panel, .map-container');
+            // Allow scrolling in scrollable panels (notebook, accusation, case select, etc.)
+            const isScrollable = e.target.closest('.notebook-page, .ending-text, .accusation-panel, .map-container, .case-select-content');
             if (!isScrollable) {
                 e.preventDefault();
             }

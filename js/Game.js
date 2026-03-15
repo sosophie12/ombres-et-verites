@@ -590,7 +590,7 @@ class Game {
         const container = Utils.$('game-container');
         container.addEventListener('touchmove', (e) => {
             // Allow scrolling in scrollable panels (notebook, accusation, case select, etc.)
-            const isScrollable = e.target.closest('.notebook-page, .ending-text, .accusation-panel, .map-container, .case-select-content');
+            const isScrollable = e.target.closest('.notebook-page, .ending-text, .accusation-panel, .map-container, #case-select-screen');
             if (!isScrollable) {
                 e.preventDefault();
             }

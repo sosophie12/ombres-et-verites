@@ -20,7 +20,12 @@ class SceneRenderer {
             'mansion_entrance','living_room','study','kitchen','garden','bedroom','office',
             'theatre_entrance','theatre_stage','backstage','theatre_office',
             'island_dock','lighthouse','lighthouse_top','keeper_house','boathouse',
-            'museum_entrance','museum_gallery','museum_security','museum_office','museum_workshop'
+            'museum_entrance','museum_gallery','museum_security','museum_office','museum_workshop',
+            'train_corridor','train_cabin','train_restaurant',
+            'hotel_hall','hotel_suite','hotel_kitchen','hotel_cave','hotel_office','hotel_room',
+            'boat_deck','boat_cabin','boat_lounge','boat_upper','boat_engine',
+            'castle_throne','castle_gallery','castle_garden','castle_kitchen','castle_bedroom',
+            'opera_dressing','opera_loge','opera_backstage','opera_control','opera_stage'
         ];
         this._loadedCount = 0;
         this._totalScenes = scenes.length;

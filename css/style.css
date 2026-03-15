@@ -1274,6 +1274,82 @@ body {
     border: 1px solid var(--success);
 }
 
+.case-badge.locked-badge {
+    background: rgba(100, 100, 100, 0.2);
+    color: var(--text-muted);
+    border: 1px solid var(--text-muted);
+}
+
+/* Level number label */
+.case-level-number {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gold);
+    margin-bottom: 6px;
+}
+
+.case-card.locked .case-level-number {
+    color: var(--text-muted);
+}
+
+/* Locked case card override */
+.case-card.locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+    filter: grayscale(0.5);
+}
+
+.case-card.locked .case-emoji {
+    filter: grayscale(1);
+    opacity: 0.6;
+}
+
+/* Completed case card */
+.case-card.completed-card {
+    border-color: rgba(74, 222, 128, 0.25);
+}
+
+.case-card.completed-card::before {
+    background: linear-gradient(90deg, var(--success), var(--gold));
+    opacity: 1;
+}
+
+/* ===== LEVEL PROGRESSION BAR ===== */
+.level-progress {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.level-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.level-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    border-radius: 10px;
+    transition: width 0.6s ease;
+    width: 0%;
+    box-shadow: 0 0 10px var(--gold-glow);
+}
+
+.level-progress-text {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
 /* ===== RESPONSIVE — TABLET ===== */
 @media (max-width: 768px) {
     .game-title { font-size: 2.5rem; }

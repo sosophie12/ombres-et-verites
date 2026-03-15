@@ -61,20 +61,37 @@ class Game {
     // ===== CASES REGISTRY =====
     _registerCases() {
         const cases = [
-            { data: window.CASE_DATA, emoji: '🏚️', badge: '' },
-            { data: window.CASE_DATA_2, emoji: '🎭', badge: 'new' },
-            { data: window.CASE_DATA_3, emoji: '🗼', badge: 'new' },
-            { data: window.CASE_DATA_4, emoji: '🏛️', badge: 'new' }
+            { data: window.CASE_DATA, emoji: '🏚️', level: 1 },
+            { data: window.CASE_DATA_2, emoji: '🎭', level: 2 },
+            { data: window.CASE_DATA_3, emoji: '🗼', level: 3 },
+            { data: window.CASE_DATA_4, emoji: '🏛️', level: 4 },
+            { data: window.CASE_DATA_5, emoji: '🚂', level: 5 },
+            { data: window.CASE_DATA_6, emoji: '🏨', level: 6 },
+            { data: window.CASE_DATA_7, emoji: '⚓', level: 7 },
+            { data: window.CASE_DATA_8, emoji: '🎭', level: 8 },
+            { data: window.CASE_DATA_9, emoji: '🎶', level: 9 }
         ];
         
-        cases.forEach(c => {
+        cases.forEach((c, idx) => {
             if (c.data) {
+                const completed = this._isCaseCompleted(c.data.id);
+                // A case is unlocked if it's the first one, or the previous case is completed
+                const previousCompleted = idx === 0 || this._isCaseCompleted(cases[idx - 1]?.data?.id);
                 window.ALL_CASES.push({
                     ...c,
-                    completed: this._isCaseCompleted(c.data.id)
+                    completed,
+                    locked: !previousCompleted
                 });
             }
         });
+    }
+
+    _getCompletedCount() {
+        return window.ALL_CASES.filter(c => c.completed).length;
+    }
+
+    _getNextCase() {
+        return window.ALL_CASES.find(c => !c.completed && !c.locked);
     }
 
     _isCaseCompleted(caseId) {
@@ -102,31 +119,58 @@ class Game {
         const grid = Utils.$('cases-grid');
         grid.innerHTML = '';
 
+        // Update progression bar
+        const completedCount = this._getCompletedCount();
+        const totalCases = window.ALL_CASES.length;
+        const progressBar = Utils.$('level-progress-fill');
+        const progressText = Utils.$('level-progress-text');
+        if (progressBar) {
+            progressBar.style.width = `${(completedCount / totalCases) * 100}%`;
+        }
+        if (progressText) {
+            progressText.textContent = `${completedCount} / ${totalCases} enquête${completedCount > 1 ? 's' : ''} résolue${completedCount > 1 ? 's' : ''}`;
+        }
+
+        // Refresh lock status
+        window.ALL_CASES.forEach((entry, idx) => {
+            entry.completed = this._isCaseCompleted(entry.data.id);
+            const prevCompleted = idx === 0 || this._isCaseCompleted(window.ALL_CASES[idx - 1]?.data?.id);
+            entry.locked = !prevCompleted;
+        });
+
         window.ALL_CASES.forEach((entry, idx) => {
             const c = entry.data;
-            const completed = this._isCaseCompleted(c.id);
             
             const card = Utils.createElement('div', 'case-card');
+            if (entry.locked) card.classList.add('locked');
+            if (entry.completed) card.classList.add('completed-card');
             
             let badgeHTML = '';
-            if (completed) {
+            if (entry.completed) {
                 badgeHTML = '<span class="case-badge completed">✓ Résolu</span>';
-            } else if (entry.badge === 'new') {
-                badgeHTML = '<span class="case-badge new">Nouveau</span>';
+            } else if (entry.locked) {
+                badgeHTML = '<span class="case-badge locked-badge">🔒 Verrouillé</span>';
+            } else {
+                badgeHTML = '<span class="case-badge new">À résoudre</span>';
             }
 
+            const levelLabel = `Niveau ${entry.level}`;
+
             card.innerHTML = `
-                <span class="case-emoji">${entry.emoji}</span>
+                <div class="case-level-number">${levelLabel}</div>
+                <span class="case-emoji">${entry.locked ? '🔒' : entry.emoji}</span>
                 ${badgeHTML}
-                <h3>${c.title}</h3>
-                <p class="case-subtitle">${c.subtitle}</p>
+                <h3>${entry.locked ? '???' : c.title}</h3>
+                <p class="case-subtitle">${entry.locked ? 'Résolvez l\'enquête précédente pour débloquer' : c.subtitle}</p>
                 <span class="case-difficulty">${c.difficulty || '⭐'}</span>
             `;
 
-            card.addEventListener('click', () => {
-                this.audio.playSfx('click');
-                this._startCase(c);
-            });
+            if (!entry.locked) {
+                card.addEventListener('click', () => {
+                    this.audio.playSfx('click');
+                    this._startCase(c);
+                });
+            }
 
             grid.appendChild(card);
         });
@@ -381,6 +425,32 @@ class Game {
         // Mark case completed if won
         if (result.correct) {
             this._markCaseCompleted(this.currentCaseData.id);
+            // Refresh lock status for all cases
+            window.ALL_CASES.forEach((entry, idx) => {
+                entry.completed = this._isCaseCompleted(entry.data.id);
+                const prevCompleted = idx === 0 || this._isCaseCompleted(window.ALL_CASES[idx - 1]?.data?.id);
+                entry.locked = !prevCompleted;
+            });
+            // Show next level button if there's a next case
+            const nextCase = this._getNextCase();
+            const btnNext = Utils.$('btn-next-level');
+            if (btnNext) {
+                if (nextCase) {
+                    btnNext.style.display = '';
+                    btnNext.textContent = `Niveau suivant : ${nextCase.data.title}`;
+                    btnNext.onclick = () => {
+                        this._startCase(nextCase.data);
+                    };
+                } else {
+                    // All cases completed
+                    btnNext.style.display = '';
+                    btnNext.textContent = '🏆 Toutes les enquêtes résolues !';
+                    btnNext.disabled = true;
+                }
+            }
+        } else {
+            const btnNext = Utils.$('btn-next-level');
+            if (btnNext) btnNext.style.display = 'none';
         }
 
         // Delete save after ending
